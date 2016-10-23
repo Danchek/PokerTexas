@@ -1,37 +1,47 @@
 class Kombination
- # Check for Kare
-  def kare(koloda, kombo, kombo_name)
+  # Check for Kare
+  def kare(koloda, kombo)
+    kombo.clear
     (0..12).each do |j|
       schet = 0
       (0..3).each do |i|
         next unless koloda[i][j].nonzero?
         schet += 1
         kombo << [i, j]
-        kombo_name = 'Каре' if schet == 4
+        @kare = 'Каре' if schet == 4
       end
-      kombo.clear if kombo_name.nil?
+      break unless @kare.nil?
+      kombo.clear
     end
+    @kare
   end
 
-  # Check for royal flash and street flash
-  def royal_street(koloda, kombo, kombo_name)
+  # Check for royal flash
+  def royal(koloda, kombo)
+    kombo.clear
     (0..3).each do |i|
-      if koloda[i][12].nonzero? && koloda[i][11].nonzero? &&
-         koloda[i][10].nonzero? && koloda[i][9].nonzero? &&
-         koloda[i][8].nonzero?
-        kombo_name = 'Роял Флеш'
-        kombo << [i, 12]
-        kombo << [i, 11]
-        kombo << [i, 10]
-        kombo << [i, 9]
-        kombo << [i, 8]
-      end
-      next unless kombo_name.nil?
+      next unless koloda[i][12].nonzero? && koloda[i][11].nonzero? &&
+                  koloda[i][10].nonzero? && koloda[i][9].nonzero? &&
+                  koloda[i][8].nonzero?
+      @royal_street = 'Роял Флеш'
+      kombo << [i, 12]
+      kombo << [i, 11]
+      kombo << [i, 10]
+      kombo << [i, 9]
+      kombo << [i, 8]
+    end
+    @royal_street
+  end
+
+  # Check for street flash
+  def street_flash(koloda, kombo)
+    kombo.clear
+    (0..3).each do |i|
       (2..9).each do |j|
         next unless koloda[i][j - 2].nonzero? && koloda[i][j - 1].nonzero? &&
                     koloda[i][j].nonzero? && koloda[i][j + 1].nonzero? &&
                     koloda[i][j + 2].nonzero?
-        kombo_name = 'Стрит Флеш'
+        @street_flash = 'Стрит Флеш'
         kombo << [i, j - 2]
         kombo << [i, j - 1]
         kombo << [i, j]
@@ -39,11 +49,12 @@ class Kombination
         kombo << [i, j + 2]
       end
     end
-    kombo.clear if kombo_name.nil?
+    @street_flash
   end
 
   # check Full House
-  def full_house(koloda, kombo, kombo_name)
+  def full_house(koloda, kombo)
+    kombo.clear
     k2 = -1
     k3 = -1
     (0..12).each do |j|
@@ -54,22 +65,23 @@ class Kombination
           kombo << [i, j]
         end
       end
-      if schet >= 2
-        k2 = j
+      if schet == 3 && k3 == -1
+        k3 = j
       elsif schet == 3 && k3 > 0
         kombo.pop
-      elsif schet == 3 && k3 == -1
-        k3 = j
+      elsif schet == 2
+        k2 = j
       elsif schet == 1
         kombo.pop
       end
     end
-    kombo_name = 'Фул Хаус' if k2 != k3 && k2 > 0 && k3 > 0
-    kombo.clear if kombo_name.nil?
+    @full_house = 'Фул Хаус' if k2 != k3 && k2 >= 0 && k3 >= 0
+    @full_house
   end
 
   # Check Flash
-  def flash(koloda, kombo, kombo_name)
+  def flash(koloda, kombo)
+    kombo.clear
     (0..3).each do |i|
       schet = 0
       12.downto(0).each do |j|
@@ -79,23 +91,24 @@ class Kombination
         end
       end
       if schet == 5
-        kombo_name = 'Флеш'
+        @flash = 'Флеш'
       elsif schet == 6
-        kombo_name = 'Флеш'
+        @flash = 'Флеш'
         kombo.pop
       elsif schet == 7
-        kombo_name = 'Флеш'
+        @flash = 'Флеш'
         kombo.pop
         kombo.pop
-      elsif schet < 5 && kombo_name.nil?
+      elsif schet < 5 && @flash.nil?
         kombo.clear
       end
     end
-    kombo.clear if kombo_name.nil?
+    @flash
   end
 
   # Check street
-  def street (koloda, kombo, kombo_name)
+  def street (koloda, kombo)
+    kombo.clear
     schet = 0
     index = 0
     mas_strit = Array.new(13) { 0 }
@@ -108,12 +121,12 @@ class Kombination
       next unless mas_strit[i - 2].nonzero? && mas_strit[i - 1].nonzero? &&
                   mas_strit[i].nonzero? && mas_strit[i + 1].nonzero? &&
                   mas_strit[i + 2].nonzero?
-      kombo_name = 'Стрит'
+      @street = 'Стрит'
       index = i
     end
-    if kombo_name.nil? && mas_strit[12].nonzero? && mas_strit[0].nonzero? &&
+    if @street.nil? && mas_strit[12].nonzero? && mas_strit[0].nonzero? &&
        mas_strit[1].nonzero? && mas_strit[2].nonzero? && mas_strit[3].nonzero?
-      kombo_name = 'Стрит'
+      @street = 'Стрит'
       index = 12
     end
     if index.nonzero? && index != 12
@@ -143,11 +156,12 @@ class Kombination
         schet += 1
       end
     end
-    kombo.clear if kombo_name.nil?
+    @street
   end
 
   # Check Set
-  def set (koloda, kombo, kombo_name)
+  def set (koloda, kombo)
+    kombo.clear
     k3 = -1
     12.downto(0).each do |j|
       schet = 0
@@ -169,12 +183,13 @@ class Kombination
         kombo.pop
       end
     end
-    kombo_name = 'Сет' if k3 > 0
-    kombo.clear if kombo_name.nil?
+    @set = 'Сет' if k3 > 0
+    @set
   end
 
   # Check pair
-  def pair(koloda, kombo, kombo_name)
+  def pair(koloda, kombo)
+    kombo.clear
     k2 = -1
     12.downto(0).each do |j|
       schet = 0
@@ -192,12 +207,13 @@ class Kombination
         kombo.pop
       end
     end
-    kombo_name = 'Пара' if k2 >= 0
-    kombo.clear if kombo_name.nil?
+    @pair = 'Пара' if k2 >= 0
+    @pair
   end
 
   # If we don't have other combinatios then choose greatest card
-  def great(koloda, kombo, kombo_name)
+  def great(koloda, kombo)
+    kombo.clear
     schet = 0
     12.downto(0).each do |j|
       (0..3).each do |i|
@@ -206,7 +222,7 @@ class Kombination
         kombo << [i, j]
       end
     end
-    kombo_name = 'Старшая карта'
-    kombo.clear if kombo_name.nil?
+    @great = 'Старшая карта'
+    @great
   end
 end

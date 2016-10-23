@@ -1,34 +1,35 @@
 require_relative '../poker'
+require_relative '../kombination'
 describe Poker do
-  poker = Poker.new
-  komanda = 'Стрит'
   koloda = Array.new(4)
   igrok = Array.new(2)
   stol = Array.new(5)
+  poker = Poker.new
   kombo = []
-  a = 2
+  kombination = Kombination.new
+  a = 3
   b = 4
 
   describe '#razdacha' do
-    it 'returns name of combination' do
-      expect(poker.razdacha(koloda, igrok, stol, poker, komanda, kombo)).not_to
-      be_empty
-      expect(kombo).not_to be_empty
+    it 'returns arrays with cards on table and in plyers hand' do
+      poker.razdacha(koloda, igrok, stol)
+      expect(igrok).not_to be_empty
+      expect(stol).not_to be_empty
     end
   end
 
-  describe '#preobraz' do
+  describe '#transformation' do
     it 'Converts index of cards to its name' do
-      expect_value = '6C'
-      expect(poker.preobraz(a, b)).to eq(expect_value)
+      expect_value = '6S'
+      expect(poker.transformation(a, b)).to eq(expect_value)
     end
   end
 
-  describe '#kombo' do
+  describe '#search' do
     it 'returns name of combination' do
-      expect(poker.razdacha(koloda, igrok, stol, poker, komanda, kombo)).not_to
-      be_empty
-      expect(kombo).not_to be_empty
+      poker.razdacha(koloda, igrok, stol)
+      kombo_name = poker.search(koloda, kombination, kombo)
+      expect(kombo_name).to be_an(String)
     end
   end
 end
